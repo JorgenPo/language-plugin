@@ -1,0 +1,38 @@
+{
+    "manifest_version": 2,
+
+    "name": "Yazik - extend your vocab",
+    "description": "Yazik helps you to learn new words. You can add all unknown words to your personal dictionary for the future repetition!",
+    "version": "0.1",
+    
+    "applications": {
+      "gecko": {
+        "id": "yazik@yazik.com",
+        "strict_min_version": "42.0"
+      }
+    },
+
+    "sidebar_action": {
+      "default_icon": "icons/sidebar_icon.png",
+      "default_title" : "Yazik page vocabulary",
+      "default_panel": "sidebar/panel.html"
+    },
+  
+    "permissions": ["storage", "tabs", "<all_urls>"],
+  
+    "content_scripts": [
+        {
+          "matches": ["<all_urls>"],
+          "js": ["content_scripts/objects.js", "content_scripts/content_script.js"]
+        }
+    ],
+
+    "commands": {
+      "_execute_sidebar_action": {
+        "suggested_key": {
+          "default": "Ctrl+Y"
+        }
+      }
+    }
+  
+  }
