@@ -27,7 +27,7 @@ class Yazik {
         for (let word of this.dictionary) {
             let text = word.text;
 
-            let regexp = new RegExp(text, "g");
+            let regexp = new RegExp(`\\b(${text})\\b`, "gi");
 
             bodyText = bodyText
                 .replace(regexp, this.getWrappedText(text));
