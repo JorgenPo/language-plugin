@@ -5,7 +5,7 @@ class Yazik {
 
         this.dictionary = [];
 
-        this.loadDictionary();
+        this.loadPageDictionary();
         this.addHandlers();
     }
 
@@ -37,14 +37,17 @@ class Yazik {
     }
 
     // Loads local storage browser dictionary
-    loadDictionary() {
-        browser.storage.local.get("dictionary").then(dictionary => {
-            if (dictionary.dictionary.length === undefined) {
+    loadPageDictionary() {
+        const url = document.location.href;
+        const dictionaryKey = `${url}.dictionary`;
+
+        browser.storage.local.get(dictionaryKey).then(dictionary => {
+            if (!dictionary[dictionaryKey] || dictionary[dictionaryKey].length === undefined) {
                 this.log(`Dictionary not found`);
                 return;
             }
 
-            this.dictionary = dictionary.dictionary;
+            this.dictionary = dictionary[dictionaryKey];
             this.log(`Dictionary loaded (${this.dictionary.length} words)`);
 
             this.highlightWords();
@@ -71,8 +74,12 @@ class Yazik {
     }
 
     saveDictionary() {
-        var dictionary = this.dictionary;
-        return browser.storage.local.set({dictionary: this.dictionary});
+        const url = document.location.href;
+
+        var dictionary = {};
+        dictionary[`${url}.dictionary`] = this.dictionary;
+
+        return browser.storage.local.set(dictionary);
     }
 
     // Check if user already studying this word
@@ -90,9 +97,14 @@ class Yazik {
     // Add new word to the dictionary
     handleNewWord(word) {
         var saved = () => {
+            const url = document.location.href;
+            const dictionaryKey = `${url}.dictionary`;
+
             this.log(`Dictionary updated. Dictionary length = ${this.dictionary.length}`);
-            let sendMessage = browser.runtime.sendMessage({command: "updateWordList"});
-            sendMessage.then(responce => {}, error => {this.error(error)});
+            let sendMessage = browser.runtime.sendMessage({command: "updateWordList", dictionaryKey: dictionaryKey});
+            sendMessage.then(responce => {
+                this.highlightWords();
+            }, error => {this.error(error)});
         };
 
         var fail = (error) => {

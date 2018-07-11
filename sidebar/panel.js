@@ -1,37 +1,63 @@
-
 class Vocabulary {
     constructor() {
-        this.updateWordList();
+        this.windowId = 0;
+
+        browser.windows.getCurrent({populate: true}).then(windowInfo => {
+            this.windowId = windowInfo.id;
+            this.updateWordList();
+        });
+        
         browser.runtime.onMessage.addListener(this.handleEvents.bind(this));
     }
 
     handleEvents(request, sender, sendResponce) {
         if (!request.command) {
-            sendResponce({result: "fail", message: "bad request"});
+            sendResponce({
+                result: "fail",
+                message: "bad request"
+            });
             return;
         }
 
-        switch(request.command) {
+        switch (request.command) {
             case "updateWordList":
-                this.updateWordList();
-            break;
+                this.updateWordList(request.dictionaryKey);
+                break;
             default:
-                sendResponce({result: "fail", message: `unknown command "${request.command}"`});
+                sendResponce({
+                    result: "fail",
+                    message: `unknown command "${request.command}"`
+                });
                 return;
         }
-        
-        sendResponce({result: "success"});
+
+        sendResponce({
+            result: "success"
+        });
     }
 
     error(error) {
         console.error("yazik: ", error);
     }
 
-    updateWordList() {
-        var getDictionary = browser.storage.local.get("dictionary");
+    async getActiveTabs() {
+        return browser.tabs.query({
+            windowId: this.windowId,
+            active: true
+        });
+    }
+
+    async updateWordList(key) {
+        if (!key) {
+            let tabs = await this.getActiveTabs();
+            key = tabs[0].url + ".dictionary";
+            console.log(key);
+        }
+
+        var getDictionary = browser.storage.local.get(key);
 
         let success = dictionary => {
-            let words = dictionary.dictionary;
+            let words = dictionary[key];
             this.renderWordList(words);
         };
 
@@ -44,7 +70,7 @@ class Vocabulary {
 
     clearWordList() {
         const list = document.querySelector(".vocabulary-list");
-        
+
         while (list.firstChild) {
             list.removeChild(list.firstChild);
         }
@@ -54,7 +80,7 @@ class Vocabulary {
         const list = document.querySelector(".vocabulary-list");
 
         this.clearWordList();
-        
+
         for (let word of words) {
             let li = document.createElement("li");
             li.textContent = word.text;
@@ -63,6 +89,6 @@ class Vocabulary {
     }
 }
 
-(function() {
+(function () {
     var vocab = new Vocabulary();
 })();

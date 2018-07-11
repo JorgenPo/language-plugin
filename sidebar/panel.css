@@ -1,0 +1,18 @@
+body {
+    background: #ffd1d1;
+}
+
+.vocabulary-title {
+    size: 130%;
+    color: rgba(0, 0, 0, 0.9);
+    text-align: center;
+}
+
+.vocabulary {
+    background-color: rgba(0, 0, 0, 0.1);
+    font-size: 120%;
+}
+
+.vocabulary-list li {
+    margin-bottom: 10px;
+}

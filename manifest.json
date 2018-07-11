@@ -23,7 +23,7 @@
     "content_scripts": [
         {
           "matches": ["<all_urls>"],
-          "js": ["content_scripts/objects.js", "content_scripts/content_script.js"],
+          "js": ["content_scripts/jquery.js", "content_scripts/translate_api.js", "content_scripts/objects.js", "content_scripts/content_script.js"],
           "css": ["content_scripts/styles.css"]
         }
     ],
