@@ -17,6 +17,25 @@ class Yazik {
         console.error("yazik: error: " + error);
     }
 
+    getWrappedText(text) {
+        return `<span class='yazik-dict-word'>${text}</span>`;
+    }
+
+    highlightWords() {
+        let bodyText = document.body.innerHTML;
+
+        for (let word of this.dictionary) {
+            let text = word.text;
+
+            let regexp = new RegExp(text, "g");
+
+            bodyText = bodyText
+                .replace(regexp, this.getWrappedText(text));
+        }
+
+        document.body.innerHTML = bodyText;
+    }
+
     // Loads local storage browser dictionary
     loadDictionary() {
         browser.storage.local.get("dictionary").then(dictionary => {
@@ -27,6 +46,8 @@ class Yazik {
 
             this.dictionary = dictionary.dictionary;
             this.log(`Dictionary loaded (${this.dictionary.length} words)`);
+
+            this.highlightWords();
         });
     }
 
