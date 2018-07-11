@@ -8,6 +8,28 @@ class Vocabulary {
         });
         
         browser.runtime.onMessage.addListener(this.handleEvents.bind(this));
+
+        this.addListeners();
+    }
+
+    async addListeners() {
+        var emptyButton = document.querySelector(".vocabulary-empty");
+        emptyButton.onclick = async () => {
+            this.dictionary = [];
+
+            let tabs = await this.getActiveTabs();
+            let key = tabs[0].url + ".dictionary";
+
+            let message = {
+                command: "saveDictionary", 
+                key: key,
+                dictionary: this.dictionary
+            };
+
+            browser.runtime.sendMessage(message).then(responce => {
+                this.updateWordList();
+            });
+        };
     }
 
     handleEvents(request, sender, sendResponce) {
@@ -51,7 +73,6 @@ class Vocabulary {
         if (!key) {
             let tabs = await this.getActiveTabs();
             key = tabs[0].url + ".dictionary";
-            console.log(key);
         }
 
         var getDictionary = browser.storage.local.get(key);

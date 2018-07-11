@@ -18,6 +18,10 @@
       "default_panel": "sidebar/panel.html"
     },
   
+    "background": {
+      "scripts": ["background/background.js"]
+    },
+
     "permissions": ["storage", "tabs", "<all_urls>"],
   
     "content_scripts": [

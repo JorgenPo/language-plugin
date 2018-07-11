@@ -75,11 +75,15 @@ class Yazik {
 
     saveDictionary() {
         const url = document.location.href;
+        let key = `${url}.dictionary`;
 
-        var dictionary = {};
-        dictionary[`${url}.dictionary`] = this.dictionary;
+        let message = {
+            command: "saveDictionary", 
+            key: key,
+            dictionary: this.dictionary
+        };
 
-        return browser.storage.local.set(dictionary);
+        return browser.runtime.sendMessage(message);
     }
 
     // Check if user already studying this word
