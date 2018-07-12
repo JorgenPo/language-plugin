@@ -36,3 +36,5 @@ async function onMessage(request, sender, sendResponce) {
 
 browser.runtime.onMessage.addListener(onMessage);
 
+browser.tabs.onUpdated.addListener(() => {console.log("yazik: onUpdate()")});
+browser.tabs.onActivated.addListener(() => {console.log("yazik: onActivate()")});

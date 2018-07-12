@@ -13,8 +13,25 @@ body {
     font-size: 120%;
 }
 
-.vocabulary-list li {
-    margin-bottom: 10px;
+.vocabulary-table {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-spacing: 0;
+}
+
+tr {
+    width: 100%;
+    margin: 0;
+}
+
+th {
+    text-align: center;
+}
+
+td {
+    width: 100%;
+    text-align: left;
 }
 
 .vocabulary-controls {

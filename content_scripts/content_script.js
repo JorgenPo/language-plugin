@@ -3,8 +3,14 @@ class Yazik {
     constructor() {
         this.log("Starting extension");
 
+        this.translator = new YandexTranslator();
         this.dictionary = [];
 
+        this.pageLanguage = undefined;
+        // TODO: browser language
+        this.browserLanguage = "ru";
+
+        this.identifyPageLanguage();
         this.loadPageDictionary();
         this.addHandlers();
     }
@@ -15,6 +21,16 @@ class Yazik {
 
     error(error) {
         console.error("yazik: error: " + error);
+    }
+
+    identifyPageLanguage() {
+        this.log("Identifying page language");
+        this.translator.getTextLanguage(document.title).then(language => {
+            this.pageLanguage = language;
+            this.log("Page language is " + this.pageLanguage);
+        }, error => {
+            this.error(error);
+        });
     }
 
     getWrappedText(text) {
@@ -99,12 +115,13 @@ class Yazik {
 
 
     // Add new word to the dictionary
-    handleNewWord(word) {
+    async handleNewWord(word) {
         var saved = () => {
             const url = document.location.href;
             const dictionaryKey = `${url}.dictionary`;
 
             this.log(`Dictionary updated. Dictionary length = ${this.dictionary.length}`);
+
             let sendMessage = browser.runtime.sendMessage({command: "updateWordList", dictionaryKey: dictionaryKey});
             sendMessage.then(responce => {
                 this.highlightWords();
@@ -115,7 +132,22 @@ class Yazik {
             this.error(`Failed to update dictionary: ${error}`);
         };
 
-        this.dictionary.push({text: word});
+        let translated = "-";
+        try {
+            translated = await this.translator.translate(word, 
+                this.pageLanguage, this.browserLanguage);
+        } catch(e) {
+            this.error(this.error);
+            return;
+        }
+
+        this.dictionary.push({
+            text: word, 
+            translated: translated, 
+            language: this.pageLanguage,
+            id: this.dictionary.length
+        });
+        
         this.saveDictionary().then(saved, fail);
     }
 }

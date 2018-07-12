@@ -90,22 +90,26 @@ class Vocabulary {
     }
 
     clearWordList() {
-        const list = document.querySelector(".vocabulary-list");
+        const tableBody = document.querySelector(".vocabulary-table-body");
 
-        while (list.firstChild) {
-            list.removeChild(list.firstChild);
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
         }
     }
 
     renderWordList(words) {
-        const list = document.querySelector(".vocabulary-list");
+        const tableBody = document.querySelector(".vocabulary-table-body");
 
         this.clearWordList();
 
         for (let word of words) {
-            let li = document.createElement("li");
-            li.textContent = word.text;
-            list.appendChild(li);
+            let tr = document.createElement("tr");
+            tr.className = "vocabulary-table-element";
+            tr.id = `vocabulary-${word.id}`;
+
+            tr.innerHTML = `<td>${word.text}</td><td>${word.translated}</td>`;
+
+            tableBody.appendChild(tr);
         }
     }
 }
