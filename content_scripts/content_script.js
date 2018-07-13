@@ -3,6 +3,7 @@ class Yazik {
     constructor() {
         this.log("Starting extension");
 
+        this.textManager = new TextManager();
         this.translator = new YandexTranslator();
         this.dictionary = [];
 
@@ -33,25 +34,6 @@ class Yazik {
         });
     }
 
-    getWrappedText(text) {
-        return `<span class='yazik-dict-word'>${text}</span>`;
-    }
-
-    highlightWords() {
-        let bodyText = document.body.innerHTML;
-
-        for (let word of this.dictionary) {
-            let text = word.text;
-
-            let regexp = new RegExp(`\\b(${text})\\b`, "gi");
-
-            bodyText = bodyText
-                .replace(regexp, this.getWrappedText(text));
-        }
-
-        document.body.innerHTML = bodyText;
-    }
-
     // Loads local storage browser dictionary
     loadPageDictionary() {
         const url = document.location.href;
@@ -66,7 +48,7 @@ class Yazik {
             this.dictionary = dictionary[dictionaryKey];
             this.log(`Dictionary loaded (${this.dictionary.length} words)`);
 
-            this.highlightWords();
+            this.textManager.highlightWords(this.dictionary);
         });
     }
 
@@ -124,7 +106,7 @@ class Yazik {
 
             let sendMessage = browser.runtime.sendMessage({command: "updateWordList", dictionaryKey: dictionaryKey});
             sendMessage.then(responce => {
-                this.highlightWords();
+                this.textManager.highlightWords(this.dictionary);
             }, error => {this.error(error)});
         };
 
@@ -154,4 +136,11 @@ class Yazik {
 
 (function() {
     const yazik = new Yazik();
+
+    const url = window.location.href;
+
+    browser.runtime.sendMessage({
+        command: "updateWordList",
+        dictionaryKey: `${url}.dictionary`
+    });
 })();
